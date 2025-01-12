@@ -4,6 +4,7 @@ import AuthRoute from "./routes/auth.route.ts";
 import type {ServerWebSocket} from "bun";
 import User from "./models/user.model.ts";
 import {generateRandomString, GetEnv} from "./libs/common/helper.ts";
+import {md5} from "js-md5";
 
 const app = new Router();
 
@@ -48,6 +49,28 @@ const server = Bun.serve<{authToken: string}>({
             ws.error = (message: string) => {
                 ws.sendText(`error|${message}`, true);
             }
+
+            try {
+                // decode authToken
+                let encodedToken = atob(ws.data.authToken);
+
+                let token = JSON.parse(encodedToken);
+
+                if(typeof token?.id != "string" && typeof token?.token != "string"){
+                    throw new Error();
+                }
+
+                if(md5(`${token.id}.${GetEnv('APP_KEY')}`) != token.token){
+                    throw new Error();
+                }
+
+                ws.data.authToken = token.id;
+            }catch (e){
+                ws.error("Invalid token");
+                ws.close();
+                return;
+            }
+
 
             const user = await User.findOne({
                 where: {
