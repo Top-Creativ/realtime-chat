@@ -1,0 +1,19 @@
+{
+  "name": "realtime-chat",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "js-md5": "^0.8.3",
+    "mariadb": "^3.4.0",
+    "sequelize": "^6.37.5"
+  }
+}
